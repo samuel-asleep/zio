@@ -1,37 +1,36 @@
-name: Sync copilot fix into fix branch
+name: Overwrite fix branch from copilot branch
 
 on:
   workflow_dispatch:
 
 jobs:
-  sync-branches:
+  overwrite:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout target branch
         uses: actions/checkout@v4
         with:
+          ref: fix-zstream-mapziopar-issue
           fetch-depth: 0
 
       - name: Configure git author
         run: |
+          git config user.name "samuel-asleep"
           git config user.email "benneu40@gmail.com"
 
-      - name: Fetch branches
+      - name: Fetch copilot branch
         run: |
           git fetch origin copilot/fix-zstream-mapziopar-issue
-          git fetch origin fix-zstream-mapziopar-issue
 
-      - name: Checkout target branch
+      - name: Overwrite files from copilot branch
         run: |
-          git checkout fix-zstream-mapziopar-issue
-
-      - name: Merge copilot changes
-        run: |
-          git merge origin/copilot/fix-zstream-mapziopar-issue --no-ff --no-edit || true
+          # Replace working tree with copilot branch contents
+          git checkout origin/copilot/fix-zstream-mapziopar-issue -- .
 
       - name: Commit changes
         run: |
+          git add -A
           if ! git diff --cached --quiet; then
             git commit -m "Fix ci"
           else
