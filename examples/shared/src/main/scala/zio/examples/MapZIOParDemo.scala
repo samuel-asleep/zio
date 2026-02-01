@@ -1,4 +1,4 @@
-package demo
+package zio.examples
 
 import zio._
 import zio.stream._
@@ -19,7 +19,7 @@ object MapZIOParDemo extends ZIOAppDefault {
       _ <- Console.printLine("After the fix, all 32 should execute in parallel\n")
 
       latch <- CountdownLatch.make(parallelism + 1)
-      startTime <- Clock.currentTime(java.util.concurrent.TimeUnit.MILLISECONDS)
+      startTime <- Clock.nanoTime
 
       fiber <- ZStream
                 .range(0, 100)
@@ -44,8 +44,8 @@ object MapZIOParDemo extends ZIOAppDefault {
       // Wait for completion
       _ <- fiber.join
 
-      endTime <- Clock.currentTime(java.util.concurrent.TimeUnit.MILLISECONDS)
-      _ <- Console.printLine(s"\nCompleted in ${endTime - startTime}ms")
+      endTime <- Clock.nanoTime
+      _ <- Console.printLine(s"\nCompleted in ${(endTime - startTime) / 1000000}ms")
 
       _ <- Console.printLine("\nTest with ordering preservation:")
       result <- ZStream
