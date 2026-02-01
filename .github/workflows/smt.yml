@@ -1,0 +1,44 @@
+name: Sync copilot fix into fix branch
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync-branches:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git author
+        run: |
+          git config user.name "benneu40"
+          git config user.email "benneu40@gmail.com"
+
+      - name: Fetch branches
+        run: |
+          git fetch origin copilot/fix-zstream-mapziopar-issue
+          git fetch origin fix-zstream-mapziopar-issue
+
+      - name: Checkout target branch
+        run: |
+          git checkout fix-zstream-mapziopar-issue
+
+      - name: Merge copilot changes
+        run: |
+          git merge origin/copilot/fix-zstream-mapziopar-issue --no-ff --no-edit || true
+
+      - name: Commit changes
+        run: |
+          if ! git diff --cached --quiet; then
+            git commit -m "Fix ci"
+          else
+            echo "No changes to commit"
+          fi
+
+      - name: Push changes
+        run: |
+          git push origin fix-zstream-mapziopar-issue
